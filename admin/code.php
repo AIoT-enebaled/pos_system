@@ -9,15 +9,13 @@ if (isset($_POST['saveAdmin'])){
     $is_ban = isset($_POST['is_ban']) == true ? 1:0;
 
     if($name != '' && $email != '' && $password != ''){
-
         $emailCheck = mysqli_query($conn, "SELECT * FROM admins WHERE email = '$email'");
-        if($emailCheck){
             if(mysqli_num_rows($emailCheck)> 0){
                 redirect('admins-create.php', 'Email Already is used by another User!');
             }
-        }
+        
 
-        $bcrypt_password = password_hash($password, PASSWORD_BCRYPT);
+        $bcrypt_password = md5($password);
 
         $data =[
         'name' =>$name,
@@ -44,7 +42,7 @@ if (isset($_POST['saveAdmin'])){
 
 if (isset($_POST['updateAdmin'])){
 
-    $adminId = validate($_POST['adminId']);
+    $adminId = $_POST['adminId'];
 
     $adminData = getById('admins', $adminId);
     if($adminData['status'] != 200){
@@ -66,19 +64,16 @@ if (isset($_POST['updateAdmin'])){
         }
     }
 
-    if ($password != ''){
-        $hashedPassword = password_hash($password,PASSWORD_BCRYPT);
-    }
-    else{
-        $hashedPassword = $adminData['data']['password'];
-    }
+        $hashedPassword = md5($password);
+    
+
 
     if($name != '' && $email != '')
     {
         $data =[
             'name' =>$name,
             'email' =>$email,
-            'password' =>$hashed_password,
+            'password' => $hashedPassword,
             'phone' =>$phone,
             'is_ban' =>$is_ban
                                 

@@ -53,40 +53,51 @@ function insert($tableName, $data){
 }
 
 
-//=========update data================
-function update($tableName, $id, $data){
+function update($tableName, $id, $data)
+{
 
     global $conn;
 
     $table = validate($tableName);
-    $id = validate ($id);
+    $id = validate($id);
 
     $updateDataString = "";
 
-    foreach ($data as $column => $value){
+    foreach ($data as $column => $value) {
         $updateDataString .= $column . '=' . "'$value',";
     }
 
-    $finalUpdateData = substr(trim($updateDataString),0,-1);
+    $finalUpdateData = substr(trim($updateDataString), 0, -1);
 
-    $query = "UPDATE $table SET $finalUpdateData WHERE $id = '$id'";
-    $result = mysqli_query($conn, $query);
+    // Use a placeholder for the item ID in the WHERE clause
+    $query = "UPDATE $table SET $finalUpdateData WHERE id = ?";
+
+    // Create a prepared statement
+    $stmt = mysqli_prepare($conn, $query);
+
+    // Bind the item ID value to the prepared statement
+    mysqli_stmt_bind_param($stmt, "s", $id);
+
+    // Execute the prepared statement
+    $result = mysqli_stmt_execute($stmt);
+
+    // Close the statement
+    mysqli_stmt_close($stmt);
+
     return $result;
 }
+
 //======= get all data from table =====
 
 function getAll($tableName, $status = NULL){
 
     global $conn;
 
-    $table = validate ($tableName);
-    $status = validate ($status);
-
     if ($status == 'status'){
-        $query = "SELECT * FROM $table WHERE $status = '0'";
+        $query = "SELECT * FROM $tableName WHERE $status = '0'";
     }
     else{
-        $query = "SELECT * FROM $table";
+        $query = "SELECT * FROM $tableName";
     }
     return mysqli_query($conn, $query);
 }

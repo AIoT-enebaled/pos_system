@@ -19,7 +19,7 @@ if (isset($_POST['loginBtn'])){
                 $hashedPassword = $row['password'];
 
                 // Use password_verify to compare the user-entered password with the hashed password.
-                if (password_verify($password, $hashedPassword)) {
+                if (md5($password) == $hashedPassword) {
                     // Passwords match, user is authenticated. You can proceed with login.
 
                     if ($row['is_ban'] == 1) {
